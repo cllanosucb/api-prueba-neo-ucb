@@ -5,7 +5,7 @@ require('dotenv').config();
 
 //conect DB
 const DBConnector = require('../db/dbconnector')
-
+//hola Gus
 var app = express()
 
 //Primera ruta principal para prueba.
