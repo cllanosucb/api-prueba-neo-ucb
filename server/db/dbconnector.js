@@ -1,12 +1,21 @@
 const mariadb = require('mariadb');
 
 const config = {
+    host: "35.197.50.99", 
+    user: "neo_lms",
+    password: "lms-neo-2021",
+    database: "neo_lms", 
+    connectionLimit: 5
+}
+
+/*const config = {
     host: "localhost", 
     user: "root",
     password: "mariadb",
-    database: "prueba", 
+    database: "prueba2", 
     connectionLimit: 5
-}
+}*/
+
 
 class DBConnector {
     dbconnector = mariadb.createPool(config);
