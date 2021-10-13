@@ -143,66 +143,25 @@ app.get('/get_all_classes', async function(req,res) {
                 page_total = page;
                 for (let i = 0; i < data.length; i++) {
                     
-                    await DBConnector.query(`INSERT INTO usuario`+
-                    `(id_usuario,userid,joined_at,first_login_at,last_login_at,logins,first_name,last_name,email,phone,teacher,student,assistant,administrator,monitor,student_id,teacher_id,birthdate,nick_name,country,archived,gender,organization_id,registro_ucb,departamento,carrera)`+
+                    await DBConnector.query(`INSERT INTO asignatura(`+
+                    `id_asignatura,name,course_code,description,syllabus,credits,display_in_catalog,catalog_category,template,organization,archived,semester,subject,start,finish,price)`+
                     `VALUES(`+
-                    `'${data[i].id}',`+
-                    `'${data[i].userid != null ? data[i].userid.replace(/'/gi, "") : 'null'}',`+
-                    `'${moment(data[i].joined_at).format('YYYY-MM-DD HH:mm:ss')}',`+
-                    `'${data[i].first_login_at != null ? moment(data[i].first_login_at).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
-                    `'${data[i].last_login_at != null ? moment(data[i].last_login_at).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
-                    `${data[i].logins},`+
-                    `'${data[i].first_name != null ? data[i].first_name.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].last_name != null ? data[i].last_name.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].email != null ? data[i].email.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].phone != null ? data[i].phone.replace(/'/gi, "") : 'null'}',`+
-                    `${data[i].teacher},`+
-                    `${data[i].student},`+
-                    `${data[i].assistant},`+
-                    `${data[i].administrator},`+
-                    `${data[i].monitor},`+
-                    `'${data[i].student_id != null ? data[i].student_id.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].teacher_id != null ? data[i].teacher_id.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].birthdate != null ? moment(data[i].birthdate.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
-                    `'${data[i].nick_name != null ? data[i].nick_name.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].country != null ? data[i].country.replace(/'/gi, "") : 'null'}',`+
+                    `${data[i].id},`+
+                    `'${data[i].name != null ? data[i].name.replace(/'/gi,"") : 'null'}',`+
+                    `'${data[i].course_code != null ? data[i].course_code.replace(/'/gi,"") : 'null'}',`+
+                    `'${data[i].description != null ? data[i].description.replace(/'/gi,"") : 'null'}',`+
+                    `'${data[i].syllabus != null ? data[i].syllabus.replace(/'/gi,"") : 'null'}',`+
+                    `${data[i].credits || 0},`+
+                    `${data[i].display_in_catalog},`+
+                    `'${data[i].catalog_category != null ? data[i].catalog_category.replace(/'/gi,"") : 'null'}',`+
+                    `${data[i].template},`+
+                    `'${data[i].organization != null ? data[i].organization.replace(/'/gi, "") : 'null'}'',`+
                     `${data[i].archived},`+
-                    `'${data[i].gender != null ? data[i].gender.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].organization_id}',`+
-                    `'${data[i]["registro ucb"] != null ? data[i]["registro ucb"].replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].departamento != null ? data[i].departamento.replace(/'/gi, "") : 'null'}',`+
-                    `'${data[i].carrera != null ? data[i].carrera.replace(/'/gi, "") : 'null'}');`);
-                    
-                    /*await DBConnector.query(`INSERT INTO asignatura(`+
-                    `id_asignatura`,
-                    `name`,
-                    `course_code`,
-                    `description`,
-                    `syllabus`,
-                    `credits`,
-                    `display_in_catalog`,
-                    `catalog_category`,
-                    `template`,
-                    `organization`,
-                    `id_organizacion`,
-                    `archived`,
-                    `semester`,
-                    `subject`,
-                    `start`,
-                    `finish`,
-                    `price`)
-                    VALUES
-                    (<{id_asignatura: }>,
-                    <{name: }>,
-                    <{course_code: }>,
-                    <{description: }>,
-                    <{syllabus: }>,
-                    <{credits: }>,
-                    <{display_in_catalog: }>,
-                    <{catalog_category: }>,
-                    <{template: }>,
-                    <{organization: }>,
-                    <{id_org  );*/
+                    `'${data[i].semester != null ? data[i].semester.replace(/'/gi,"") : 'null'}',`+
+                    `'${data[i].subject != null ? data[i].subject.replace(/'/gi,"") : 'null'}',`+
+                    `'${data[i].start != null ? moment(data[i].start.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
+                    `'${data[i].finish != null ? moment(data[i].finish.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
+                    `${data[i].price || 0});`  );
                     
                     lista.push(data[i]);
                     //console.log(data[i]);
@@ -221,7 +180,7 @@ app.get('/get_all_classes', async function(req,res) {
     res.json({
         page: "total de paginas recorridas "+page_total,
         total_classes: lista.length,
-        users: lista
+        lessons: lista
     })
 })
 
