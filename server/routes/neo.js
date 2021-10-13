@@ -150,12 +150,12 @@ app.get('/get_all_classes', async function(req,res) {
                     `'${data[i].name != null ? data[i].name.replace(/'/gi,"") : 'null'}',`+
                     `'${data[i].course_code != null ? data[i].course_code.replace(/'/gi,"") : 'null'}',`+
                     `'${data[i].description != null ? data[i].description.replace(/'/gi,"") : 'null'}',`+
-                    `'${data[i].syllabus != null ? data[i].syllabus.replace(/'/gi,"") : 'null'}',`+
+                    `\'${data[i].syllabus != null ? data[i].syllabus.replace(/'/gi,"") : 'null'}\',`+
                     `${data[i].credits || 0},`+
                     `${data[i].display_in_catalog},`+
                     `'${data[i].catalog_category != null ? data[i].catalog_category.replace(/'/gi,"") : 'null'}',`+
                     `${data[i].template},`+
-                    `'${data[i].organization != null ? data[i].organization.replace(/'/gi, "") : 'null'}'',`+
+                    `'${data[i].organization != null ? data[i].organization.replace(/'/gi, "") : 'null'}',`+
                     `${data[i].archived},`+
                     `'${data[i].semester != null ? data[i].semester.replace(/'/gi,"") : 'null'}',`+
                     `'${data[i].subject != null ? data[i].subject.replace(/'/gi,"") : 'null'}',`+
