@@ -537,7 +537,7 @@ app.get('/get_assignments_for_class', async function(req,res) {
     
     try {
 
-        const dbasignatura = await DBConnector.query("select id_asignatura from asignatura where semester like '%2-2021%' and organization in ('Regional Santa Cruz','Regional La Paz','Regional Cochabamba','Regional Tarija')");
+        const dbasignatura = await DBConnector.query("select id_asignatura from asignatura where semester like '%2-2021%' and organization in ('Regional Santa Cruz','Regional La Paz','Regional Cochabamba','Regional Tarija','Formación Continua SCZ','Formación Continua LPZ','Universidad Católica Boliviana')");
 
         for (let i = 0; i < dbasignatura.length-1; i++) {
     
