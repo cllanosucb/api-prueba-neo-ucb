@@ -24,16 +24,18 @@ class DBConnector {
         var conn = await this.dbconnector.getConnection();
         var ret = null;
 
-        conn.query(param)
+        await conn.query(param)
             .then(data => {
                 ret = data;
-                console.log("==============");
-                console.log(data);
-                console.log("==============");
+                /*console.log("==============");
+                console.log(data); 
+                console.log("==============");*/
                 conn.end()
             })
             .catch( err => {
+                console.log("=======ERROR=======");
                 console.log(err);
+                console.log("=======ERROR=======");
                 conn.end();
             });
         return ret
