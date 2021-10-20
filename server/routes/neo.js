@@ -649,7 +649,7 @@ app.get('/get_assignments_for_class2', async function(req,res) {
                         `weight = ${data[j].weight || 0},`+
                         `category = \'${data[j].category}\',`+
                         `grading = \'${data[j].grading}\',`+
-                        `gateway = ${data[j].gateway},`+
+                        `gateway = ${data[j].gateway || false},`+
                         `lesson = \'${data[j].lesson != null ? data[j].lesson : ""}\',`+
                         `begin = '${data[j].begin != null ? moment(data[j].begin.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
                         `end = '${data[j].end != null ? data[j].end === "-" ? '0000-00-00 00:00:00' : moment(data[j].end.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
@@ -671,7 +671,7 @@ app.get('/get_assignments_for_class2', async function(req,res) {
                         `${data[j].weight || 0},`+
                         `\'${data[j].category}\',`+
                         `\'${data[j].grading}\',`+
-                        `${data[j].gateway},`+
+                        `${data[j].gateway || false},`+
                         `\'${data[j].lesson != null ? data[j].lesson : ""}\',`+
                         `'${data[j].begin != null ? moment(data[j].begin.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
                         `'${data[j].end != null ? data[j].end === "-" ? '0000-00-00 00:00:00' : moment(data[j].end.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
@@ -701,7 +701,6 @@ app.get('/get_assignments_for_class2', async function(req,res) {
         cant_asignaturas
     })
 })
-
 
 
 module.exports = app;
