@@ -416,7 +416,7 @@ app.get('/get_lessons_for_class', async function(req,res) {
     //const dbasignatura = []; 
     try {
 
-        const dbasignatura = await DBConnector.query("SELECT id_asignatura FROM asignatura");
+        const dbasignatura = await DBConnector.query("select id_asignatura from asignatura where semester like '%2-2021%' and organization in ('Regional Santa Cruz','Regional La Paz','Regional Cochabamba','Regional Tarija','Formación Continua SCZ','Formación Continua LPZ','Universidad Católica Boliviana')");
 
         for (let i = 0; i < dbasignatura.length-1; i++) {
     
@@ -425,89 +425,102 @@ app.get('/get_lessons_for_class', async function(req,res) {
 
             if(data.length > 0) {
                 cant_lessons ++;
-                const [dblesson=null, meta] = await DBConnector.query(`SELECT * `+
-                    `FROM leccion `+
-                    `WHERE id_leccion = ${data[i].id}`);
-
-                if(dblesson != null){
-                    //update
-                    const dbupdate = await DBConnector.query(`UPDATE leccion SET `+
-                    `id_leccion = ${data[i].id},`+
-                    `id_asignatura = '${dbasignatura[i].id_asignatura}',`+
-                    `name = '${data[i].name}',`+
-                    `start_at = '${data[i].start_at != null ? moment(data[i].start.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
-                    `end_at = '${data[i].end_at != null ? moment(data[i].end_at.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
-                    `description = '${data[i].description}'`+
-                    `WHERE id_leccion = ${data[i].id};`);
-
-                    if(data[i].sections.length > 0) {
-                        for (let j = 0; j < data[i].sections.length; j++) {
-                            const [dbsection=null, meta] = await DBConnector.query(`SELECT * `+
-                            `FROM seccion `+
-                            `WHERE id_seccion = ${data[i].sections[j].id}`);
-
-                            if(dbsection != null) {
-                                //update
-                                const dbupdatesection = await DBConnector.query(`UPDATE seccion SET `+
-                                `id_seccion = ${data[i].sections[j].id},`+
-                                `id_leccion = ${data[i].id},`+
-                                `name = '${data[i].sections[j].name}',`+
-                                `assignment_id = ${data[i].sections[j].assignment_id || ''},`+
-                                `type = '${data[i].sections[j].type}'`+
-                                `WHERE id_seccion = ${data[i].sections[j].id};`);
-                                console.log("secction update ", dbupdatesection);
-                                cant_section_update++;
-                            }else {
-                                //insert
+                for (let j = 0; j < data.length; j++) {
+                    
+                    console.log("leccion id", data[j]);
+                    const [dblesson=null, meta] = await DBConnector.query(`SELECT * `+
+                        `FROM leccion `+
+                        `WHERE id_leccion = ${data[j].id}`);
+    
+                    if(dblesson != null){
+                        //update
+                        const dbupdate = await DBConnector.query(`UPDATE leccion SET `+
+                        `id_leccion = ${data[j].id},`+
+                        `id_asignatura = '${dbasignatura[j].id_asignatura}',`+
+                        `name = '${data[j].name}',`+
+                        `start_at = '${data[j].start_at != null ? moment(data[j].start).format('YYYY-MM-DD') : '0000-00-00'}',`+
+                        `end_at = '${data[j].end_at != null ? moment(data[j].end_at).format('YYYY-MM-DD') : '0000-00-00'}',`+
+                        `description = '${data[j].description}'`+
+                        `WHERE id_leccion = ${data[j].id};`);
+    
+                        if(data[j].sections.length > 0) {
+                            for (let k = 0; k < data[j].sections.length; k++) {
+                                const [dbsection=null, meta] = await DBConnector.query(`SELECT * `+
+                                `FROM seccion `+
+                                `WHERE id_seccion = ${data[j].sections[k].id}`);
+    
+                                if(dbsection != null) {
+                                    //update
+                                    const dbupdatesection = await DBConnector.query(`UPDATE seccion SET `+
+                                    `id_seccion = ${data[j].sections[k].id},`+
+                                    `id_leccion = '${data[j].id}',`+
+                                    `name = '${data[j].sections[k].name}',`+
+                                    `assignment_id = ${data[j].sections[k].assignment_id || null},`+
+                                    `type = '${data[j].sections[k].type}'`+
+                                    `WHERE id_seccion = ${data[j].sections[k].id};`);
+                                    console.log("asignatura id", dbasignatura[i].id_asignatura);
+                                    console.log("leccion id", data[j].id);
+                                    console.log("secction update ", dbupdatesection);
+                                    cant_section_update++;
+                                }else {
+                                    //insert
+                                    const dbinsertsecction = await DBConnector.query(`INSERT INTO seccion(`+
+                                    `id_seccion,id_leccion,name,assignment_id,type)`+
+                                    `VALUES(`+
+                                    `${data[j].sections[k].id},`+
+                                    `${data[j].id},`+
+                                    `'${data[j].sections[k].name}',`+
+                                    `${data[j].sections[k].assignment_id || null},`+
+                                    `'${data[j].sections[k].type}');`);
+                                    console.log("asignatura id", dbasignatura[i].id_asignatura);
+                                    console.log("leccion id", data[j].id);
+                                    console.log("secction insert ", dbinsertsecction);
+                                    cant_section_insert++;
+                                }
+    
+                            }
+    
+                        }
+                        console.log("asignatura id", dbasignatura[i].id_asignatura);
+                        console.log("leccion id", data[j].id);
+                        console.log("update ",dbupdate);  
+                        cant_lessons_update++;
+                    }else{
+                        //insert
+                        const resp = await DBConnector.query(`INSERT INTO leccion`+
+                        `(id_leccion,id_asignatura,name,start_at,end_at,description)`+
+                        `VALUES (`+ 
+                        `${data[j].id},`+
+                        `'${dbasignatura[i].id_asignatura}',`+
+                        `'${data[j].name}',`+
+                        `'${data[j].start_at != null ? moment(data[j].start).format('YYYY-MM-DD') : '0000-00-00'}',`+
+                        `'${data[j].end_at != null ? moment(data[j].end_at).format('YYYY-MM-DD') : '0000-00-00'}',`+
+                        `'${data[j].description}');`);
+    
+                        if(data[j].sections.length > 0) {
+                            //insert
+                            for (let k = 0; k < data[j].sections.length; k++) {
                                 const dbinsertsecction = await DBConnector.query(`INSERT INTO seccion(`+
                                 `id_seccion,id_leccion,name,assignment_id,type)`+
                                 `VALUES(`+
-                                `${data[i].sections[j].id},`+
-                                `${data[i].id},`+
-                                `'${data[i].sections[j].name}',`+
-                                `${data[i].sections[j].assignment_id || ''},`+
-                                `'${data[i].sections[j].type}');`);
+                                `${data[j].sections[k].id},`+
+                                `${data[j].id},`+
+                                `'${data[j].sections[k].name}',`+
+                                `${data[j].sections[k].assignment_id || null},`+
+                                `'${data[j].sections[k].type}');`);
+                                console.log("asignatura id", dbasignatura[i].id_asignatura);
+                                console.log("leccion id", data[j].id);
                                 console.log("secction insert ", dbinsertsecction);
                                 cant_section_insert++;
                             }
-
+    
                         }
-
+    
+                        cant_lessons_insert++;
+                        console.log("asignatura id", dbasignatura[i].id_asignatura);
+                        console.log("leccion id", data[j].id);
+                        console.log("insert", resp);
                     }
-
-                    console.log("update ",dbupdate);  
-                    cant_lessons_update++;
-                }else{
-                    //insert
-                    const resp = await DBConnector.query(`INSERT INTO leccion`+
-                    `(id_leccion,id_asignatura,name,start_at,end_at,description)`+
-                    `VALUES (`+ 
-                    `${data[i].id},`+
-                    `'${dbasignatura[i].id_asignatura}',`+
-                    `'${data[i].name}',`+
-                    `'${data[i].start_at != null ? moment(data[i].start.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
-                    `'${data[i].end_at != null ? moment(data[i].end_at.replace(/'/gi, "")).format('YYYY-MM-DD') : '0000-00-00'}',`+
-                    `'${data[i].description}');`);
-
-                    if(data[i].sections.length > 0) {
-                        //insert
-                        for (let k = 0; k < array.length; k++) {
-                            const dbinsertsecction = await DBConnector.query(`INSERT INTO seccion(`+
-                            `id_seccion,id_leccion,name,assignment_id,type)`+
-                            `VALUES(`+
-                            `${data[i].sections[k].id},`+
-                            `${data[i].id},`+
-                            `'${data[i].sections.sections[k].name}',`+
-                            `${data[i].sections.sections[k].assignment_id || ''},`+
-                            `'${data[i].sections.sections[k].type}');`);
-                            console.log("secction insert ", dbinsertsecction);
-                            cant_section_insert++;
-                        }
-
-                    }
-
-                    cant_lessons_insert++;
-                    console.log("insert", resp);
                 }
 
             }
@@ -537,94 +550,7 @@ app.get('/get_assignments_for_class', async function(req,res) {
     
     try {
 
-        const dbasignatura = await DBConnector.query("SELECT id_asignatura FROM asignatura");
-
-        for (let i = 0; i < dbasignatura.length-1; i++) {
-    
-            const response = await fetch(`${process.env.URL}/get_assignments_for_class?api_key=${process.env.API_KEY}&class_id=${dbasignatura[i].id_asignatura}`);
-            const data = await response.json();
-            
-            if(data.length > 0) {
-                cant_asignaturas++;
-                for (let j = 0; j < data.length; j++) {
-                    
-                    const [dbasignacion=null, meta] = await DBConnector.query(`SELECT * `+
-                    `FROM asignacion `+
-                    `WHERE id_asignacion = ${data[j].id}`);
-
-                    if(dbasignacion != null) {
-                        //update
-                        const dbupdate = await DBConnector.query(`UPDATE asignacion SET `+
-                        `id_asignacion = ${data[j].id},`+
-                        `name = \'${data[j].name.replace(/'/gi, "")}\',`+
-                        `type = \'${data[j].type}\',`+
-                        `points = ${data[j].points || 0},`+
-                        `weight = ${data[j].weight || 0},`+
-                        `category = \'${data[j].category}\',`+
-                        `grading = \'${data[j].grading}\',`+
-                        `gateway = ${data[j].gateway},`+
-                        `lesson = \'${data[j].lesson != null ? data[j].lesson : ""}\',`+
-                        `begin = '${data[j].begin != null ? moment(data[j].begin.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
-                        `end = '${data[j].end != null ? data[j].end === "-" ? '0000-00-00 00:00:00' : moment(data[j].end.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
-                        `given = ${data[j].given != undefined ? data[j].given : true},`+
-                        `id_asignatura = ${dbasignatura[i].id_asignatura} `+
-                        `WHERE id_asignacion = ${data[j].id};`);
-                        console.log("asignatura", dbasignatura[i].id_asignatura);
-                        console.log("update", dbupdate);
-                        cant_update_asignacion++;
-                    }else {
-                        //insert
-                        const dbinsert = await DBConnector.query(`INSERT INTO asignacion`+
-                        `(id_asignacion,name,type,points,weight,category,grading,gateway,lesson,begin,end,given,id_asignatura)`+
-                        `VALUES(`+
-                        `${data[j].id},`+
-                        `\'${data[j].name.replace(/'/gi, "")}\',`+
-                        `\'${data[j].type}\',`+
-                        `${data[j].points || 0},`+
-                        `${data[j].weight || 0},`+
-                        `\'${data[j].category}\',`+
-                        `\'${data[j].grading}\',`+
-                        `${data[j].gateway},`+
-                        `\'${data[j].lesson != null ? data[j].lesson : ""}\',`+
-                        `'${data[j].begin != null ? moment(data[j].begin.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
-                        `'${data[j].end != null ? data[j].end === "-" ? '0000-00-00 00:00:00' : moment(data[j].end.replace(/'/gi, "")).format('YYYY-MM-DD HH:mm:ss') : '0000-00-00 00:00:00'}',`+
-                        `${data[j].given != undefined ? data[j].given : true},`+
-                        `${dbasignatura[i].id_asignatura});`
-                        );
-                        console.log("asignatura", dbasignatura[i].id_asignatura);
-                        console.log("insert", dbinsert);
-                        cant_insert_asignacion++;
-                    }
-
-    
-                }
-            }
-
-
-        }
-
-    } catch (error) {
-        console.log(error);
-    }
-    
-    
-    res.json({
-        cant_insert_asignacion,
-        cant_update_asignacion,
-        cant_asignaturas
-    })
-})
-
-
-app.get('/get_assignments_for_class2', async function(req,res) {
-
-    let cant_insert_asignacion = 0;
-    let cant_update_asignacion = 0;
-    let cant_asignaturas = 0;
-    
-    try {
-
-        const dbasignatura = await DBConnector.query("SELECT id_asignatura FROM asignatura");
+        const dbasignatura = await DBConnector.query("select id_asignatura from asignatura where semester like '%2-2021%' and organization in ('Regional Santa Cruz','Regional La Paz','Regional Cochabamba','Regional Tarija','Formación Continua SCZ','Formación Continua LPZ','Universidad Católica Boliviana')");
 
         for (let i = 0; i < dbasignatura.length-1; i++) {
     
