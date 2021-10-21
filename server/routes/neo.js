@@ -628,5 +628,47 @@ app.get('/get_assignments_for_class', async function(req,res) {
     })
 })
 
+//get_students_for_class
+app.get('/get_students_for_class', async function(req, res) {
+    let cant_est = 0;
+    let cant_insert = 0;
+    try {
+        const dbasignatura = await DBConnector.query("select id_asignatura from asignatura where semester like '%2-2021%' and organization in ('Regional Santa Cruz','Regional La Paz','Regional Cochabamba','Regional Tarija','Formación Continua SCZ','Formación Continua LPZ','Universidad Católica Boliviana')");
+        for (let i = 0; i < dbasignatura.length; i++) {
+            const response = await fetch(`${process.env.URL}/get_students_for_class?api_key=${process.env.API_KEY}&class_id=${dbasignatura[i].id_asignatura}`);
+            const data = await response.json();
+
+            if(data.length > 0) {
+                for (let j = 0; j < data.length; j++) {
+                    console.log("asignatura", dbasignatura[i].id_asignatura);
+                    const [dbestasignatura=null, meta] = await DBConnector.query(`SELECT * `+
+                    `FROM asignatura_usuario `+
+                    `WHERE id_usuario = ${data[j].id} and id_asignatura = ${dbasignatura[i].id_asignatura}`);
+                    
+                    if(dbestasignatura == null){
+                        console.log("estudiante", data[j].id);
+                        const dbinsertestasignatura = await DBConnector.query(`INSERT INTO asignatura_usuario(`+
+                            `id_usuario,id_asignatura)`+
+                            `VALUES(`+
+                            `${data[j].id},`+
+                            `${dbasignatura[i].id_asignatura});`);
+                        cant_est ++;
+                        cant_insert ++;
+                        console.log("insert", dbinsertestasignatura);
+                    }
+                    
+                }
+            }
+
+        }
+    } catch (error) {
+        console.log(error);
+    }
+    res.json({
+        cant_insert,
+        cant_est,
+        cant_asignaturas: dbasignatura.length
+    })
+})
 
 module.exports = app;
