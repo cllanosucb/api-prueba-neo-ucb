@@ -632,8 +632,10 @@ app.get('/get_assignments_for_class', async function(req,res) {
 app.get('/get_students_for_class', async function(req, res) {
     let cant_est = 0;
     let cant_insert = 0;
+    let cant_asignaturas = 0;
     try {
         const dbasignatura = await DBConnector.query("select id_asignatura from asignatura where semester like '%2-2021%' and organization in ('Regional Santa Cruz','Regional La Paz','Regional Cochabamba','Regional Tarija','Formación Continua SCZ','Formación Continua LPZ','Universidad Católica Boliviana')");
+        cant_asignaturas = dbasignatura.length;
         for (let i = 0; i < dbasignatura.length; i++) {
             const response = await fetch(`${process.env.URL}/get_students_for_class?api_key=${process.env.API_KEY}&class_id=${dbasignatura[i].id_asignatura}`);
             const data = await response.json();
@@ -667,7 +669,7 @@ app.get('/get_students_for_class', async function(req, res) {
     res.json({
         cant_insert,
         cant_est,
-        cant_asignaturas: dbasignatura.length
+        cant_asignaturas
     })
 })
 
