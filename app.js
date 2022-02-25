@@ -1,8 +1,8 @@
 const express = require('express') //llamamos a Express
 
-var app = express()               
+var app = express()
 
-var port = process.env.PORT || 3000  // establecemos nuestro puerto
+var port = process.env.PORT || 3000 // establecemos nuestro puerto
 
 // para establecer las distintas rutas, necesitamos instanciar el express router
 var router = express.Router()
@@ -17,4 +17,3 @@ app.use('/api/neo', require('./server/routes/index'))
 app.listen(port, () => {
     console.log('API escuchando en el puerto ' + port)
 })
-
